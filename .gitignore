@@ -1,5 +1,8 @@
 # phpstorm project files
 .idea
+.vscode
 
 /node_modules
 /dist
+/.clinic
+TERMINAL.md

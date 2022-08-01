@@ -6,6 +6,10 @@ import { TYPES } from '../types';
 import { ILogger } from '../logger/logger.interface';
 import 'reflect-metadata';
 import { IUserController } from './user.controller.interface';
+/** для отладки нагружаем систему */
+// import fs from 'fs';
+// import { resolve } from 'path';
+// const data = [];
 
 @injectable()
 export class UsersController extends BaseController implements IUserController {
@@ -22,10 +26,12 @@ export class UsersController extends BaseController implements IUserController {
 	//     res.send('About this wiki');
 	// })
 	login(req: Request, res: Response, next: NextFunction): void {
-		next(new HTTPError(401, 'ошибка авторизации'));
+		next(new HTTPError(401, 'Ошибка авторизации', 'login'));
 	}
 
 	register(req: Request, res: Response, next: NextFunction): void {
+		/** для отладки нагружаем систему (читаем файл) */
+		// data.push(fs.readFileSync(resolve(__dirname, '../../test.mp4')));
 		this.ok(res, 'register');
 	}
 
