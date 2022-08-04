@@ -6,6 +6,8 @@ import { TYPES } from '../types';
 import { ILogger } from '../logger/logger.interface';
 import 'reflect-metadata';
 import { IUserController } from './user.controller.interface';
+import { UserLoginDto } from './dto/user-login.dto';
+import { User } from './user.entity';
 /** для отладки нагружаем систему */
 // import fs from 'fs';
 // import { resolve } from 'path';
@@ -25,14 +27,24 @@ export class UsersController extends BaseController implements IUserController {
 	// router.method('path', function (req, res) {
 	//     res.send('About this wiki');
 	// })
-	login(req: Request, res: Response, next: NextFunction): void {
+	login(req: Request<{}, {}, UserLoginDto>, res: Response, next: NextFunction): void {
+		console.log(req.body);
 		next(new HTTPError(401, 'Ошибка авторизации', 'login'));
 	}
 
-	register(req: Request, res: Response, next: NextFunction): void {
+	async register(
+		{ body }: Request<{}, {}, UserLoginDto>,
+		res: Response,
+		next: NextFunction,
+	): Promise<void> {
+		console.log(body);
 		/** для отладки нагружаем систему (читаем файл) */
 		// data.push(fs.readFileSync(resolve(__dirname, '../../test.mp4')));
-		this.ok(res, 'register');
+		const newUser = new User(body.email, body.name);
+		await newUser.setPassword(body.password);
+		console.log(newUser.password); // получен hash
+
+		this.ok(res, newUser);
 	}
 
 	// register(req: Request, res: Response, next: NextFunction) {

@@ -6,6 +6,7 @@ import { ILogger } from './logger/logger.interface';
 import { inject, injectable } from 'inversify';
 import { TYPES } from './types';
 import 'reflect-metadata';
+import { json } from 'body-parser';
 
 @injectable()
 export class App {
@@ -19,7 +20,7 @@ export class App {
 		@inject(TYPES.ExceptionFilter) private exceptionFilter: ExceptionFilter,
 	) {
 		this.app = express();
-		this.port = 8080;
+		this.port = 8000;
 	}
 
 	// для примера
@@ -27,6 +28,10 @@ export class App {
 	// router.method('path', function (req, res) {
 	//     res.send('About this wiki');
 	// })
+	useMiddleware(): void {
+		this.app.use(json());
+	}
+
 	userRouter(): void {
 		this.app.use('/users', this.usersController.router);
 	}
@@ -36,6 +41,7 @@ export class App {
 	}
 
 	public async init(): Promise<void> {
+		this.useMiddleware();
 		this.userRouter();
 		this.useExceptionFilters();
 		this.server = this.app.listen(this.port);

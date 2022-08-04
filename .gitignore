@@ -1,6 +1,6 @@
 # phpstorm project files
-.idea
-.vscode
+/.idea
+/.vscode
 
 
 /node_modules
