@@ -4,9 +4,11 @@ import { HTTPError } from '../errors/http-error.class';
 import { inject, injectable } from 'inversify';
 import { TYPES } from '../types';
 import { ILogger } from '../logger/logger.interface';
+import { IUserService } from './users.service.interface';
 import 'reflect-metadata';
-import { IUserController } from './user.controller.interface';
+import { IUserController } from './users.controller.interface';
 import { UserLoginDto } from './dto/user-login.dto';
+import { UserRegisterDto } from './dto/user-register.dto';
 import { User } from './user.entity';
 /** для отладки нагружаем систему */
 // import fs from 'fs';
@@ -14,9 +16,12 @@ import { User } from './user.entity';
 // const data = [];
 
 @injectable()
-export class UsersController extends BaseController implements IUserController {
-	constructor(@inject(TYPES.ILogger) private LoggerService: ILogger) {
-		super(LoggerService);
+export class UserController extends BaseController implements IUserController {
+	constructor(
+		@inject(TYPES.ILogger) private loggerService: ILogger,
+		@inject(TYPES.UserService) private userService: IUserService,
+	) {
+		super(loggerService);
 		this.bindRouter([
 			{ path: '/register', method: 'post', func: this.register },
 			{ path: '/login', method: 'post', func: this.login },
@@ -33,21 +38,14 @@ export class UsersController extends BaseController implements IUserController {
 	}
 
 	async register(
-		{ body }: Request<{}, {}, UserLoginDto>,
+		{ body }: Request<{}, {}, UserRegisterDto>,
 		res: Response,
 		next: NextFunction,
 	): Promise<void> {
-		console.log(body);
-		/** для отладки нагружаем систему (читаем файл) */
-		// data.push(fs.readFileSync(resolve(__dirname, '../../test.mp4')));
-		const newUser = new User(body.email, body.name);
-		await newUser.setPassword(body.password);
-		console.log(newUser.password); // получен hash
-
-		this.ok(res, newUser);
+		const result = await this.userService.createUser(body);
+		if (!result) {
+			return next(new HTTPError(422, 'Такой пользователь уже существует'));
+		}
+		this.ok(res, result);
 	}
-
-	// register(req: Request, res: Response, next: NextFunction) {
-	//     this.ok(res, 'register')
-	// }
 }

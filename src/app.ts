@@ -1,6 +1,6 @@
 import express, { Express } from 'express';
 import { Server } from 'http';
-import { UsersController } from './users/users.controller';
+import { UserController } from './users/users.controller';
 import { ExceptionFilter } from './errors/exception.filter';
 import { ILogger } from './logger/logger.interface';
 import { inject, injectable } from 'inversify';
@@ -16,7 +16,7 @@ export class App {
 
 	constructor(
 		@inject(TYPES.ILogger) private logger: ILogger,
-		@inject(TYPES.UsersController) private usersController: UsersController,
+		@inject(TYPES.UserController) private userController: UserController,
 		@inject(TYPES.ExceptionFilter) private exceptionFilter: ExceptionFilter,
 	) {
 		this.app = express();
@@ -33,7 +33,7 @@ export class App {
 	}
 
 	userRouter(): void {
-		this.app.use('/users', this.usersController.router);
+		this.app.use('/users', this.userController.router);
 	}
 
 	useExceptionFilters(): void {
