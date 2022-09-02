@@ -1,13 +1,14 @@
 import express, { Express } from 'express';
+import { Server } from 'http';
+import 'reflect-metadata';
+import { inject, injectable } from 'inversify';
+import { json } from 'body-parser';
 import { IExceptionFilter } from './errors/exception.filter.interface';
 import { IConfigService } from './config/config.service.interface';
 import { UserController } from './users/users.controller';
+import { PrismaService } from './database/prisma.service';
 import { ILogger } from './logger/logger.interface';
-import { inject, injectable } from 'inversify';
 import { TYPES } from './types';
-import 'reflect-metadata';
-import { json } from 'body-parser';
-import { Server } from 'http';
 
 @injectable()
 export class App {
@@ -20,9 +21,10 @@ export class App {
 		@inject(TYPES.UserController) private userController: UserController,
 		@inject(TYPES.ExceptionFilter) private exceptionFilter: IExceptionFilter,
 		@inject(TYPES.ConfigService) private configService: IConfigService,
+		@inject(TYPES.PrismaService) private prismaService: PrismaService,
 	) {
 		this.app = express();
-		this.port = 8000;
+		this.port = 8080;
 	}
 
 	// для примера
@@ -46,6 +48,7 @@ export class App {
 		this.useMiddleware();
 		this.userRouter();
 		this.useExceptionFilters();
+		await this.prismaService.connect();
 		this.server = this.app.listen(this.port);
 		this.logger.log(`Server run on localhost:${this.port}`);
 	}

@@ -2,6 +2,10 @@
 /.idea
 /.vscode
 /.env
+/prisma/migrations
+/prisma/dev.db
+/prisma/dev.db-journal
+
 
 /node_modules
 /dist
